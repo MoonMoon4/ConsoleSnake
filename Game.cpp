@@ -99,7 +99,7 @@ void Game::Input()
             DirectionSnake = Direction::RIGHT;
             break;
         case 'e':
-            GameOver = true;
+            MenuClose = false;
             break;
         }
     }
@@ -149,7 +149,9 @@ void Game::Logic() // Event Handling
     for (int i = 0; (i < LocTailSnake[X].size()) && (i < LocTailSnake[Y].size()); i++) // The snake bumps into its tail?
     {
         if ((SnakeX == LocTailSnake[X][i]) && (SnakeY == LocTailSnake[Y][i]))
-            GameOver = true;
+        {
+            MenuClose = false;
+        }
     }
 
     if (SnakeX == FoodX && SnakeY == FoodY) // Did you eat the food?
@@ -171,8 +173,10 @@ void Game::Logic() // Event Handling
         }
     }
 
-    if ((SnakeX == Width || SnakeY == Height) || (SnakeX == -1 || SnakeY == -1)) // Border
-        GameOver = true;
+    if ((SnakeX == Width || SnakeY == Height) || (SnakeX == -1 || SnakeY == -1))// Border
+    {
+        MenuClose = false;
+    } 
 }
 
 bool Game::GetGameOver() // Is the game over?
@@ -180,8 +184,61 @@ bool Game::GetGameOver() // Is the game over?
     return !GameOver;
 }
 
+bool Game::MenuIsClosed()
+{
+    return !MenuClose;
+}
+
 void SetColor(int text, int background) // Sets the color
 {
     HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
     SetConsoleTextAttribute(hStdOut, (WORD)((background << 4) | text));
+}
+
+void Game::MenuCycle()
+{
+    int Key = 0;
+    int ColorText1 = 15;
+    int ColorText2 = 7;
+    while (MenuIsClosed())
+    {
+        system("cls");
+
+        SetColor(2, 0);
+        std::cout << LogoData << std::endl;
+
+        SetColor(ColorText1, 0);
+        if (ColorText1 != 15)
+            std::cout << "> Start the game!" << std::endl;
+        else
+            std::cout << "-> Start the game!" << std::endl;
+
+        SetColor(ColorText2, 0);
+        if (ColorText2 != 15)
+            std::cout << "> Quit to Windows" << std::endl;
+        else
+            std::cout << "-> Quit to Windows" << std::endl;
+
+        if (_kbhit())
+        {
+            switch (tolower(_getch()))
+            {
+            case 'w':
+                Key = 'w';
+                ColorText1 = 15;
+                ColorText2 = 7;
+                break;
+            case 's':
+                Key = 's';
+                ColorText2 = 15;
+                ColorText1 = 7;
+                break;
+            case 13:
+                if (Key == 's')
+                    exit(0);
+                MenuClose = true;
+                break;
+            }
+        }
+    }
 }

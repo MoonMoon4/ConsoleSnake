@@ -13,14 +13,21 @@ class Game
 {
   private:
     bool GameOver = false;
+    bool MenuClose = false;
     const int Width = 20;
     const int Height = 10;
-    unsigned int Score = 0;
+    int Score = 0;
 
     int SnakeY = Height / 2, SnakeX = Width / 2;
     int FoodY, FoodX;
 
     std::vector<int> LocTailSnake[2];
+
+    const char *LogoData = {" ____              _        \n"
+                            "/ ___| _ __   __ _| | _____ \n"
+                            "\\___ \\| '_ \\ / _` | |/ / _ \\\n"
+                            " ___) | | | | (_| |   <  __/\n"
+                            "|____/|_| |_|\\__,_|_|\\_\\___|\n"};
 
     enum class Direction
     {
@@ -30,7 +37,6 @@ class Game
         UP,
         DOWN
     };
-
     Direction DirectionSnake = Direction::STOP;
 
   public:
@@ -39,6 +45,8 @@ class Game
     void Input();
     void Logic();
     bool GetGameOver();
+    bool MenuIsClosed();
+    void MenuCycle();
 };
 
 void SetColor(int text, int background);
