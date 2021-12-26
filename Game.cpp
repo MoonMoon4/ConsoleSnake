@@ -1,13 +1,5 @@
 #include "Game.h"
 
-Game::Game()
-{
-    FoodX = rand() % Width;
-    FoodY = rand() % Height;
-
-    Score = 0;
-}
-
 void Game::Render()
 {
     system("cls");
@@ -25,39 +17,35 @@ void Game::Render()
 
         for (int b = 0; b < Width; b++)
         {
-            bool Space = true;
             if (b == SnakeX && i == SnakeY) // Snake
             {
                 SetColor(11, 0);
                 std::cout << "O";
                 continue;
             }
-            else if (Score >= 14) // Tail
+            bool Space = true;
+            for (int k = 0; (k < LocTailSnake[X].size()) && (k < LocTailSnake[Y].size()); k++)
             {
-                for (int k = 0; (k < LocTailSnake[X].size()) && (k < LocTailSnake[Y].size()); k++)
+                if (b == LocTailSnake[X][k] && i == LocTailSnake[Y][k])
                 {
-                    if (b == LocTailSnake[X][k] && i == LocTailSnake[Y][k])
-                    {
-                        SetColor(3, 0);
-                        std::cout << "0";
-                        Space = false;
-                        break;
-                    }
+                    SetColor(3, 0);
+                    std::cout << "0";
+                    Space = false;
+                    break;
                 }
             }
-
             if (b == FoodX && i == FoodY) // Food
             {
-                SetColor(rand() % 15, 0);
                 std::cout << "0";
                 continue;
             }
-
+            
             if (Space)
             {
                 std::cout << " ";
             }
         }
+
         SetColor(7, 0);
         std::cout << "X" << std::endl;
     }
@@ -78,29 +66,29 @@ void Game::Input()
     {
         switch (tolower(_getch()))
         {
-        case 'w':
-            if ((Direction::DOWN == DirectionSnake) && (LocTailSnake[Y].size() > 0))
+            case 'w':
+                if ((Direction::DOWN == DirectionSnake) && (LocTailSnake[Y].size() > 0))
+                    break;
+                DirectionSnake = Direction::UP;
                 break;
-            DirectionSnake = Direction::UP;
-            break;
-        case 's':
-            if ((Direction::UP == DirectionSnake) && (LocTailSnake[Y].size() > 0))
+            case 's':
+                if ((Direction::UP == DirectionSnake) && (LocTailSnake[Y].size() > 0))
+                    break;
+                DirectionSnake = Direction::DOWN;
                 break;
-            DirectionSnake = Direction::DOWN;
-            break;
-        case 'a':
-            if ((Direction::RIGHT == DirectionSnake) && (LocTailSnake[Y].size() > 0))
+            case 'a':
+                if ((Direction::RIGHT == DirectionSnake) && (LocTailSnake[Y].size() > 0))
+                    break;
+                DirectionSnake = Direction::LEFT;
                 break;
-            DirectionSnake = Direction::LEFT;
-            break;
-        case 'd':
-            if ((Direction::LEFT == DirectionSnake) && (LocTailSnake[Y].size() > 0))
+            case 'd':
+                if ((Direction::LEFT == DirectionSnake) && (LocTailSnake[Y].size() > 0))
+                    break;
+                DirectionSnake = Direction::RIGHT;
                 break;
-            DirectionSnake = Direction::RIGHT;
-            break;
-        case 'e':
-            MenuClose = false;
-            break;
+            case 27: // esc
+                MenuClose = false;
+                break;
         }
     }
 }
@@ -132,26 +120,24 @@ void Game::Logic() // Event Handling
 
     switch (DirectionSnake) // Keyboard click processing
     {
-    case Direction::UP:
-        SnakeY--;
-        break;
-    case Direction::DOWN:
-        SnakeY++;
-        break;
-    case Direction::LEFT:
-        SnakeX--;
-        break;
-    case Direction::RIGHT:
-        SnakeX++;
-        break;
+        case Direction::UP:
+            SnakeY--;
+            break;
+        case Direction::DOWN:
+            SnakeY++;
+            break;
+        case Direction::LEFT:
+            SnakeX--;
+            break;
+        case Direction::RIGHT:
+            SnakeX++;
+            break;
     }
 
     for (int i = 0; (i < LocTailSnake[X].size()) && (i < LocTailSnake[Y].size()); i++) // The snake bumps into its tail?
     {
         if ((SnakeX == LocTailSnake[X][i]) && (SnakeY == LocTailSnake[Y][i]))
-        {
             MenuClose = false;
-        }
     }
 
     if (SnakeX == FoodX && SnakeY == FoodY) // Did you eat the food?
@@ -173,10 +159,8 @@ void Game::Logic() // Event Handling
         }
     }
 
-    if ((SnakeX == Width || SnakeY == Height) || (SnakeX == -1 || SnakeY == -1))// Border
-    {
+    if ((SnakeX == Width || SnakeY == Height) || (SnakeX == -1 || SnakeY == -1)) // Border
         MenuClose = false;
-    } 
 }
 
 bool Game::GetGameOver() // Is the game over?
@@ -197,47 +181,51 @@ void SetColor(int text, int background) // Sets the color
 
 void Game::MenuCycle()
 {
-    int Key = 0;
     int ColorText1 = 15;
     int ColorText2 = 7;
+
     while (MenuIsClosed())
     {
         system("cls");
 
+
         SetColor(2, 0);
         std::cout << LogoData << std::endl;
 
+
         SetColor(ColorText1, 0);
+
         if (ColorText1 != 15)
             std::cout << "> Start the game!" << std::endl;
         else
             std::cout << "-> Start the game!" << std::endl;
 
+
         SetColor(ColorText2, 0);
+
         if (ColorText2 != 15)
             std::cout << "> Quit to Windows" << std::endl;
         else
             std::cout << "-> Quit to Windows" << std::endl;
 
+
         if (_kbhit())
         {
             switch (tolower(_getch()))
             {
-            case 'w':
-                Key = 'w';
-                ColorText1 = 15;
-                ColorText2 = 7;
-                break;
-            case 's':
-                Key = 's';
-                ColorText2 = 15;
-                ColorText1 = 7;
-                break;
-            case 13:
-                if (Key == 's')
-                    exit(0);
-                MenuClose = true;
-                break;
+                case 'w': {
+                    ColorText1 = 15, ColorText2 = 7;
+                    break;
+                }
+                case 's': {
+                    ColorText2 = 15, ColorText1 = 7;
+                    break;
+                }
+                case 13: { // Enter
+                    if (ColorText2 == 15) exit(0);
+                    MenuClose = true;
+                    break;
+                }
             }
         }
     }

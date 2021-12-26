@@ -1,15 +1,13 @@
 ﻿#include "Game.h"
 
-
 int main()
 {
     Game Game;
 
-
+    Sleep(200);
     while (Game.GetGameOver())
     {
         Game.MenuCycle();
-        Sleep(200);
         Game.Render();
         Game.Input();
         Game.Logic();

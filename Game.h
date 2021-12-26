@@ -19,7 +19,7 @@ class Game
     int Score = 0;
 
     int SnakeY = Height / 2, SnakeX = Width / 2;
-    int FoodY, FoodX;
+    int FoodX = rand() % Width, FoodY = rand() % Height;
 
     std::vector<int> LocTailSnake[2];
 
@@ -40,7 +40,6 @@ class Game
     Direction DirectionSnake = Direction::STOP;
 
   public:
-    Game();
     void Render();
     void Input();
     void Logic();
