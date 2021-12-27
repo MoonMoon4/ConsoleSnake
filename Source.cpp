@@ -4,9 +4,9 @@ int main()
 {
     Game Game;
 
-    Sleep(200);
     while (Game.GetGameOver())
     {
+        Sleep(100);
         Game.MenuCycle();
         Game.Render();
         Game.Input();

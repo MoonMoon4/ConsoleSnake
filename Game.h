@@ -12,14 +12,15 @@
 class Game
 {
   private:
-    bool GameOver = false;
-    bool MenuClose = false;
+    bool GameOver;
+    bool MenuClose;
+
     const int Width = 20;
     const int Height = 10;
-    int Score = 0;
+    int Score;
 
-    int SnakeY = Height / 2, SnakeX = Width / 2;
-    int FoodX = rand() % Width, FoodY = rand() % Height;
+    int SnakeY, SnakeX;
+    int FoodX, FoodY;
 
     std::vector<int> LocTailSnake[2];
 
@@ -40,6 +41,8 @@ class Game
     Direction DirectionSnake = Direction::STOP;
 
   public:
+    Game();
+    void StartGame();
     void Render();
     void Input();
     void Logic();

@@ -1,5 +1,20 @@
 #include "Game.h"
 
+Game::Game()
+{
+    GameOver = false, MenuClose = false;
+    Score = 0;
+
+    SnakeY = Height / 2, SnakeX = Width / 2;
+    FoodX = rand() % Width, FoodY = rand() % Height;
+}
+
+void Game::StartGame()
+{
+    this->Game::Game();
+    MenuClose = true;
+}
+
 void Game::Render()
 {
     system("cls");
@@ -36,6 +51,7 @@ void Game::Render()
             }
             if (b == FoodX && i == FoodY) // Food
             {
+                SetColor(5, 0);
                 std::cout << "0";
                 continue;
             }
@@ -134,11 +150,13 @@ void Game::Logic() // Event Handling
             break;
     }
 
+
     for (int i = 0; (i < LocTailSnake[X].size()) && (i < LocTailSnake[Y].size()); i++) // The snake bumps into its tail?
     {
         if ((SnakeX == LocTailSnake[X][i]) && (SnakeY == LocTailSnake[Y][i]))
             MenuClose = false;
     }
+
 
     if (SnakeX == FoodX && SnakeY == FoodY) // Did you eat the food?
     {
@@ -214,16 +232,20 @@ void Game::MenuCycle()
             switch (tolower(_getch()))
             {
                 case 'w': {
-                    ColorText1 = 15, ColorText2 = 7;
+                    ColorText1 = 15;
+                    ColorText2 = 7;
                     break;
                 }
                 case 's': {
-                    ColorText2 = 15, ColorText1 = 7;
+                    ColorText2 = 15;
+                    ColorText1 = 7;
                     break;
                 }
                 case 13: { // Enter
                     if (ColorText2 == 15) exit(0);
+
                     MenuClose = true;
+                    this->Game::StartGame();
                     break;
                 }
             }
