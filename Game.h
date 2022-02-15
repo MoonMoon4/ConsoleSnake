@@ -1,54 +1,47 @@
 #pragma once
 
-#include "cctype"
-#include <Windows.h>
-#include <conio.h>
+#include <curses.h>
+
 #include <iostream>
+#include <string>
 #include <vector>
 
-#define X 0
-#define Y 1
+#include "AdditionalFunctions.h"
+#include "GameObjects.h"
 
-class Game
-{
-  private:
-    bool GameOver;
-    bool MenuClose;
+class Game {
 
-    const int Width = 20;
-    const int Height = 10;
-    int Score;
+    bool game_over_;
 
-    int SnakeY, SnakeX;
-    int FoodX, FoodY;
+    int score_;
 
-    std::vector<int> LocTailSnake[2];
+    Snake snake_;
+    Food food_f_snake_;
 
-    const char *LogoData = {" ____              _        \n"
-                            "/ ___| _ __   __ _| | _____ \n"
-                            "\\___ \\| '_ \\ / _` | |/ / _ \\\n"
-                            " ___) | | | | (_| |   <  __/\n"
-                            "|____/|_| |_|\\__,_|_|\\_\\___|\n"};
+    const std::string logo_data_ =   {" ____              _        \n"
+                                    "/ ___| _ __   __ _| | _____ \n"
+                                    "\\___ \\| '_ \\ / _` | |/ / _ \\\n"
+                                    " ___) | | | | (_| |   <  __/\n"
+                                    "|____/|_| |_|\\__,_|_|\\_\\___|\n"};
 
-    enum class Direction
-    {
+    const std::string text_score = "SCORE";
+
+    enum class Direction {
         STOP = 0,
         LEFT,
         RIGHT,
         UP,
         DOWN
     };
-    Direction DirectionSnake = Direction::STOP;
+
+    Direction direction_snake_ = Direction::STOP;
 
   public:
     Game();
-    void StartGame();
     void Render();
     void Input();
     void Logic();
-    bool GetGameOver();
-    bool MenuIsClosed();
-    void MenuCycle();
+    void Put(int x, int y, char ch) const;
+    bool IsGameOver() const;
+    bool MenuIsClosed() const;
 };
-
-void SetColor(int text, int background);

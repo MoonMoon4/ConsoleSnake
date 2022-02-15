@@ -1,254 +1,118 @@
 #include "Game.h"
 
-Game::Game()
-{
-    GameOver = false, MenuClose = false;
-    Score = 0;
 
-    SnakeY = Height / 2, SnakeX = Width / 2;
-    FoodX = rand() % Width, FoodY = rand() % Height;
-}
+Game::Game() : game_over_(true), score_(0), snake_(std::vector<int>(1, COLS / 2), std::vector<int>(1, LINES / 2), '*'),
+      food_f_snake_(std::vector<int>(1, rand() % COLS), std::vector<int>(1, rand() % LINES), '0') {}
 
-void Game::StartGame()
-{
-    this->Game::Game();
-    MenuClose = true;
-}
+void Game::Render() {
+    clear();
 
-void Game::Render()
-{
-    system("cls");
+    attron(COLOR_PAIR(COLOR_RED));
+    Put(snake_.loc[X][0], snake_.loc[Y][0], snake_.ch);
 
-    SetColor(7, 0);
-    for (int i = 0; i <= Width + 1; i++) // UP
-    {
-        std::cout << "X";
-    }
-    std::cout << std::endl;
+    attron(COLOR_PAIR(rand() % 8));
+    Put(food_f_snake_.loc[X][0], food_f_snake_.loc[Y][0], food_f_snake_.ch);
 
-    for (int i = 0; i < Height; i++)
-    {
-        std::cout << "X";
-
-        for (int b = 0; b < Width; b++)
-        {
-            if (b == SnakeX && i == SnakeY) // Snake
-            {
-                SetColor(11, 0);
-                std::cout << "O";
-                continue;
-            }
-            bool Space = true;
-            for (int k = 0; (k < LocTailSnake[X].size()) && (k < LocTailSnake[Y].size()); k++)
-            {
-                if (b == LocTailSnake[X][k] && i == LocTailSnake[Y][k])
-                {
-                    SetColor(3, 0);
-                    std::cout << "0";
-                    Space = false;
-                    break;
-                }
-            }
-            if (b == FoodX && i == FoodY) // Food
-            {
-                SetColor(5, 0);
-                std::cout << "0";
-                continue;
-            }
-            
-            if (Space)
-            {
-                std::cout << " ";
-            }
-        }
-
-        SetColor(7, 0);
-        std::cout << "X" << std::endl;
-    }
-
-    for (int i = 0; i <= Width + 1; i++) // DOWN
-    {
-        std::cout << "X";
-    }
-    std::cout << std::endl;
-
-    SetColor(4, 0);
-    std::cout << "Score : " << Score;
-}
-
-void Game::Input()
-{
-    if (_kbhit()) // Saving input
-    {
-        switch (tolower(_getch()))
-        {
-            case 'w':
-                if ((Direction::DOWN == DirectionSnake) && (LocTailSnake[Y].size() > 0))
-                    break;
-                DirectionSnake = Direction::UP;
-                break;
-            case 's':
-                if ((Direction::UP == DirectionSnake) && (LocTailSnake[Y].size() > 0))
-                    break;
-                DirectionSnake = Direction::DOWN;
-                break;
-            case 'a':
-                if ((Direction::RIGHT == DirectionSnake) && (LocTailSnake[Y].size() > 0))
-                    break;
-                DirectionSnake = Direction::LEFT;
-                break;
-            case 'd':
-                if ((Direction::LEFT == DirectionSnake) && (LocTailSnake[Y].size() > 0))
-                    break;
-                DirectionSnake = Direction::RIGHT;
-                break;
-            case 27: // esc
-                MenuClose = false;
-                break;
-        }
-    }
-}
-
-void Game::Logic() // Event Handling
-{
-    if (1 <= LocTailSnake[X].size()) // Lengthening of the tail
-    {
-        int TempX1 = LocTailSnake[X][0], TempY1 = LocTailSnake[Y][0];
-        int TempX2 = 0, TempY2 = 0;
-
-        LocTailSnake[X][0] = SnakeX;
-        LocTailSnake[Y][0] = SnakeY;
-
-        for (int i = 1; ((i <= LocTailSnake[X].size() - 1) && (i <= LocTailSnake[Y].size() - 1)); i++)
-        {
-            if ((1 <= LocTailSnake[X].size() - 1) && (1 <= LocTailSnake[Y].size() - 1))
-            {
-                TempX2 = LocTailSnake[X][i];
-                LocTailSnake[X][i] = TempX1;
-                TempX1 = TempX2;
-
-                TempY2 = LocTailSnake[Y][i];
-                LocTailSnake[Y][i] = TempY1;
-                TempY1 = TempY2;
-            }
+    attron(COLOR_PAIR(COLOR_GREEN));
+    if (snake_.SnakeSize() >= 2) {
+        for (int i = 1; i < snake_.SnakeSize(); i++) {
+            Put(snake_.loc[X][i], snake_.loc[Y][i], snake_.ch);
         }
     }
 
-    switch (DirectionSnake) // Keyboard click processing
-    {
-        case Direction::UP:
-            SnakeY--;
+    attron(COLOR_PAIR(COLOR_YELLOW));
+    for (int i = 0; i < text_score.size(); i++) {
+        Put(0 + i, 0, text_score[i]);
+    }
+
+    std::vector<int> numbers;
+    Parse(score_, numbers);
+
+    for (int i = 1; i <= numbers.size(); i++) {
+        Put(text_score.size() + i, 0, numbers[numbers.size() - i] + 48);
+    }
+}
+
+void Game::Input() {
+    switch (wgetch(stdscr)) {
+        case 'w':
+            if ((Direction::DOWN == direction_snake_) && (snake_.SnakeSize() > 0))
+                break;
+            direction_snake_ = Direction::UP;
             break;
-        case Direction::DOWN:
-            SnakeY++;
+        case 's':
+            if ((Direction::UP == direction_snake_) && (snake_.SnakeSize() > 0))
+                break;
+            direction_snake_ = Direction::DOWN;
             break;
-        case Direction::LEFT:
-            SnakeX--;
+        case 'a':
+            if ((Direction::RIGHT == direction_snake_) && (snake_.SnakeSize() > 0))
+                break;
+            direction_snake_ = Direction::LEFT;
             break;
-        case Direction::RIGHT:
-            SnakeX++;
+        case 'd':
+            if ((Direction::LEFT == direction_snake_) && (snake_.SnakeSize() > 0))
+                break;
+            direction_snake_ = Direction::RIGHT;
+            break;
+    }
+}
+
+
+void Game::Logic() { // Event Handling
+    if (2 <= snake_.SnakeSize()) { // Lengthening of the tail 
+        snake_.loc[X][1] = snake_.loc[X][0];
+        snake_.loc[Y][1] = snake_.loc[Y][0];
+
+        for (int i = 2; i < snake_.SnakeSize(); i++) {
+            std::swap(snake_.loc[X][i], snake_.loc[X][i - 1]);
+            std::swap(snake_.loc[Y][i], snake_.loc[Y][i - 1]);
+        }
+    }
+
+    switch (direction_snake_) { // Keyboard click processing
+        case Direction::UP: snake_.loc[Y][0]--;
+            break;
+        case Direction::DOWN: snake_.loc[Y][0]++;
+            break;
+        case Direction::LEFT: snake_.loc[X][0]--;
+            break;
+        case Direction::RIGHT: snake_.loc[X][0]++;
             break;
     }
 
-
-    for (int i = 0; (i < LocTailSnake[X].size()) && (i < LocTailSnake[Y].size()); i++) // The snake bumps into its tail?
-    {
-        if ((SnakeX == LocTailSnake[X][i]) && (SnakeY == LocTailSnake[Y][i]))
-            MenuClose = false;
-    }
-
-
-    if (SnakeX == FoodX && SnakeY == FoodY) // Did you eat the food?
-    {
-        Score += 14;
-
-        FoodX = rand() % Width;
-        FoodY = rand() % Height;
-
-        if ((1 <= LocTailSnake[X].size()) && (1 <= LocTailSnake[Y].size()))
-        {
-            LocTailSnake[X].push_back(LocTailSnake[X][LocTailSnake[X].size() - 1]);
-            LocTailSnake[Y].push_back(LocTailSnake[Y][LocTailSnake[Y].size() - 1]);
-        }
-        else if ((0 == LocTailSnake[X].size()) && (0 <= LocTailSnake[Y].size()))
-        {
-            LocTailSnake[X].push_back(SnakeX);
-            LocTailSnake[Y].push_back(SnakeY);
+    for (int i = 1; i <= snake_.SnakeSize() - 1; i++) { // The snake bumps into its tail?
+        if ((snake_.loc[X][0] == snake_.loc[X][i]) && (snake_.loc[Y][0] == snake_.loc[Y][i])) {
+            game_over_ = false;
+            break;
         }
     }
 
-    if ((SnakeX == Width || SnakeY == Height) || (SnakeX == -1 || SnakeY == -1)) // Border
-        MenuClose = false;
-}
+    if ((snake_.loc[X][0] == food_f_snake_.loc[X][0]) && (snake_.loc[Y][0] == food_f_snake_.loc[Y][0])) { // Did you eat the food?
+        score_ += 14;
 
-bool Game::GetGameOver() // Is the game over?
-{
-    return !GameOver;
-}
+        food_f_snake_.loc[X][0] = rand() % COLS;
+        food_f_snake_.loc[Y][0] = rand() % LINES;
 
-bool Game::MenuIsClosed()
-{
-    return !MenuClose;
-}
-
-void SetColor(int text, int background) // Sets the color
-{
-    HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    SetConsoleTextAttribute(hStdOut, (WORD)((background << 4) | text));
-}
-
-void Game::MenuCycle()
-{
-    int ColorText1 = 15;
-    int ColorText2 = 7;
-
-    while (MenuIsClosed())
-    {
-        system("cls");
-
-
-        SetColor(2, 0);
-        std::cout << LogoData << std::endl;
-
-
-        SetColor(ColorText1, 0);
-
-        if (ColorText1 != 15)
-            std::cout << "> Start the game!" << std::endl;
-        else
-            std::cout << "-> Start the game!" << std::endl;
-
-
-        SetColor(ColorText2, 0);
-
-        if (ColorText2 != 15)
-            std::cout << "> Quit to Windows" << std::endl;
-        else
-            std::cout << "-> Quit to Windows" << std::endl;
-
-
-        if (_kbhit())
-        {
-            switch (tolower(_getch()))
-            {
-                case 'w': {
-                    ColorText1 = 15;
-                    ColorText2 = 7;
-                    break;
-                }
-                case 's': {
-                    ColorText2 = 15;
-                    ColorText1 = 7;
-                    break;
-                }
-                case 13: { // Enter
-                    if (ColorText2 == 15) exit(0);
-
-                    MenuClose = true;
-                    this->Game::StartGame();
-                    break;
-                }
-            }
-        }
+        snake_.loc[X].push_back(snake_.loc[X][snake_.loc[X].size() - 1]);
+        snake_.loc[Y].push_back(snake_.loc[Y][snake_.loc[Y].size() - 1]);
     }
+
+    if (((snake_.loc[X][0] == COLS) || (snake_.loc[Y][0] == LINES)) || ((snake_.loc[X][0] == -1) || (snake_.loc[Y][0] == -1))) { // Border
+        game_over_ = false;
+    }
+}
+
+bool Game::IsGameOver() const { 
+    return game_over_;
+}
+
+bool Game::MenuIsClosed() const {
+    return game_over_;
+}
+
+void Game::Put(int x, int y, char ch) const {
+    move(y, x);
+    addch(ch);
+    napms(5);
 }
