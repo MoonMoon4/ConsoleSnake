@@ -34,13 +34,25 @@ void Game::Render() {
 
 void Game::Input() {
     switch (wgetch(stdscr)) {
-        case 'w': direction_snake_ = Direction::UP;
+        case 'w': 
+            if (Direction::DOWN != direction_snake_) {
+                direction_snake_ = Direction::UP;
+            }
             break;
-        case 's':  direction_snake_ = Direction::DOWN;
+        case 's':  
+            if (Direction::UP != direction_snake_) {
+                direction_snake_ = Direction::DOWN;
+            }
             break;
-        case 'a': direction_snake_ = Direction::LEFT;
+        case 'a': 
+            if (Direction::RIGHT != direction_snake_) {
+                direction_snake_ = Direction::LEFT;
+            }
             break;
-        case 'd': direction_snake_ = Direction::RIGHT;
+        case 'd': 
+            if (Direction::LEFT != direction_snake_) {
+                direction_snake_ = Direction::RIGHT;
+            }
             break;
     }
 }
