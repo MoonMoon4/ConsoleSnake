@@ -1,6 +1,5 @@
 #include "Game.h"
 
-
 Game::Game() : game_over_(true), score_(0), snake_(std::vector<int>(1, COLS / 2), std::vector<int>(1, LINES / 2), '*'),
       food_f_snake_(std::vector<int>(1, rand() % COLS), std::vector<int>(1, rand() % LINES), '0') {}
 
@@ -35,25 +34,13 @@ void Game::Render() {
 
 void Game::Input() {
     switch (wgetch(stdscr)) {
-        case 'w':
-            if ((Direction::DOWN == direction_snake_) && (snake_.SnakeSize() > 0))
-                break;
-            direction_snake_ = Direction::UP;
+        case 'w': direction_snake_ = Direction::UP;
             break;
-        case 's':
-            if ((Direction::UP == direction_snake_) && (snake_.SnakeSize() > 0))
-                break;
-            direction_snake_ = Direction::DOWN;
+        case 's':  direction_snake_ = Direction::DOWN;
             break;
-        case 'a':
-            if ((Direction::RIGHT == direction_snake_) && (snake_.SnakeSize() > 0))
-                break;
-            direction_snake_ = Direction::LEFT;
+        case 'a': direction_snake_ = Direction::LEFT;
             break;
-        case 'd':
-            if ((Direction::LEFT == direction_snake_) && (snake_.SnakeSize() > 0))
-                break;
-            direction_snake_ = Direction::RIGHT;
+        case 'd': direction_snake_ = Direction::RIGHT;
             break;
     }
 }
@@ -114,5 +101,5 @@ bool Game::MenuIsClosed() const {
 void Game::Put(int x, int y, char ch) const {
     move(y, x);
     addch(ch);
-    napms(5);
+    napms(1);
 }

@@ -6,6 +6,8 @@
 int main() {
     ConsoleInit();
 
+    srand(time(NULL));
+
     Game game_snake;
 
     while (game_snake.IsGameOver()) {
